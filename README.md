@@ -1,44 +1,78 @@
-# RAG com SQL — Chinook SQLite (Perguntas → SQL → Execução → Resposta)
+# RAG + SQL — Natural Language to SQL
 
-Descrição
---------
-Pipeline RAG para um banco SQLite (Chinook). Recebe perguntas em linguagem natural, gera uma query SQL restrita ao schema do banco, executa a query localmente no SQLite e retorna uma resposta em linguagem natural baseada nos resultados.
+Projeto de **AI Engineering aplicado a dados relacionais**. A aplicação recebe uma pergunta em linguagem natural, utiliza um LLM para gerar SQL restrito ao schema do banco Chinook, executa a consulta localmente e transforma o resultado em uma resposta compreensível.
 
-Principais tecnologias
-----------------------
+## Arquitetura
+
+```text
+Pergunta do usuário
+        ↓
+Contexto do schema
+        ↓
+LLM / Text-to-SQL
+        ↓
+Validação da SQL
+        ↓
+SQLite / Chinook
+        ↓
+Resultado estruturado
+        ↓
+Resposta em linguagem natural
+```
+
+## Tecnologias
+
 - Python 3.10+
-- OpenAI (API Chat completions)
-- sqlite3 (biblioteca padrão do Python)
-- Docker (opcional)
+- OpenAI API
+- SQLite / sqlite3
+- Prompt Engineering
+- Docker (estrutura preparada)
+- python-dotenv
 
-Instalação
----------
-1. Clone o repositório:
-   git clone https://github.com/giovanna-albertini/rag-sql-chinook.git
-2. Crie e ative um ambiente virtual:
-   python -m venv .venv
-   source .venv/bin/activate
-3. Instale dependências:
-   pip install -r requirements.txt
-4. Coloque o arquivo Chinook SQLite em `data/` (nome esperado: `Chinook_Sqlite.sqlite`) e configure sua chave:
-   export OPENAI_API_KEY="sua_chave_aqui"
+## Exemplo de caso de uso
 
-Uso
----
-- Executar uma pergunta (padrão usa data/Chinook_Sqlite.sqlite):
-  python -m src.rag_sql_chinook.main --query "Qual artista gerou mais receita para a loja?"
+**Pergunta:** Qual artista gerou mais receita para a loja?
 
-Argumentos úteis
-----------------
-- --db PATH    : caminho para o arquivo SQLite (padrão: data/Chinook_Sqlite.sqlite)
-- --query TEXT : pergunta em linguagem natural a ser convertida e executada
-- --dry-run    : mostra a SQL gerada sem executar
+O pipeline transforma a intenção em uma consulta compatível com o schema, executa a SQL e usa apenas o resultado retornado para compor a resposta.
 
-Boas práticas
-------------
-- Não commite chaves de API. Use variáveis de ambiente ou Secrets do CI.
-- Revise a SQL gerada antes de executar em bancos de produção. Este projeto assume uso em banco local somente.
+## Segurança
 
-Licença
--------
-MIT (padrão)
+O projeto foi desenvolvido para **banco SQLite local de demonstração**. Em ambientes reais, uma arquitetura Text-to-SQL deve utilizar usuário read-only, allowlist de comandos, limites de execução, validação da query e observabilidade.
+
+O argumento `--dry-run` permite inspecionar a SQL antes da execução.
+
+## Execução
+
+```bash
+pip install -r requirements.txt
+export OPENAI_API_KEY="sua_chave"
+python -m src.rag_sql_chinook.main --query "Qual artista gerou mais receita para a loja?"
+```
+
+Banco esperado: `data/Chinook_Sqlite.sqlite`.
+
+## Estrutura
+
+```text
+rag-sql-chinook/
+├── src/
+├── notebooks/
+├── data/
+├── docker/
+├── requirements.txt
+├── .gitignore
+└── LICENSE
+```
+
+## Próximas evoluções
+
+- validação estrutural de SQL com parser;
+- bloqueio explícito de DDL/DML;
+- testes automatizados;
+- FastAPI;
+- Docker executável;
+- tracing e avaliação de qualidade das respostas.
+
+## Competências demonstradas
+
+`LLMs` · `Text-to-SQL` · `Python` · `SQL` · `Prompt Engineering` · `AI Engineering` · `Data Engineering`
